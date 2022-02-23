@@ -1,0 +1,103 @@
+---
+title: "PCA y Clustering"
+author: "Andrés Felipe Florián Quitián,Luisa Salcedo, Camilo Martínez"
+date: "22/11/2020"
+output: html_document
+---
+
+
+
+Se carga el dataset.
+```{r}
+datos = read.csv('data.csv',sep = ",")
+datos2 = read.csv('data.csv',sep = ",")
+datos = datos[3:32]
+head(datos)
+```
+
+Realizamos PCA con prcomp y cargamos ggplot2.
+```{r}
+library(ggplot2)
+datos.pca2 = prcomp(datos, scale=TRUE)
+nci_pca_x = data.frame(datos.pca2$x)
+#nci_pca_x$diagnosis = datos2$diagnosis
+summary(datos.pca2)
+```
+Gráfica de las componentes principales.
+```{r}
+library(ggfortify)
+autoplot(datos.pca2, data = datos2, colour = 'diagnosis')
+```
+Gráfica proporción de la varianza.
+```{r}
+nci_pca_pve = 100*datos.pca2$sdev^2/sum(datos.pca2$sdev^2)
+nci_pca_pve_df = data.frame(Component=c(1:30), PVE=nci_pca_pve)
+ggplot(nci_pca_pve_df, aes(x=Component, y=PVE)) + geom_point() + geom_line()
+```
+Cluster jerarquico.
+```{r}
+nci_pca_x = data.frame(datos.pca2$x)
+hc.out=hclust(dist(nci_pca_x[,1:7]), method = "complete")
+hc.clusters=cutree(hc.out,2)
+table(datos2[,2], hc.clusters)
+
+# Esta no es matriz de confución, tabla de continencia (frecuencia).
+```
+
+Dendograma.
+
+
+```{r}
+hc.out=hclust(dist(nci_pca_x[,1:7]), method = "complete")
+plot(hc.out,labels=datos2[,2], main="Hier. Clust. on First Seven Score Vectors")
+abline(h=23, col="red")
+```
+
+```{r}
+nci_pca_x = data.frame(datos.pca2$x)
+hc.out=hclust(dist(nci_pca_x[,1:7]), method = "average")
+hc.clusters=cutree(hc.out,2)
+table(datos2[,2], hc.clusters)
+
+# Esta no es matriz de confucnión, tabla de continencia (frecuencia).
+```
+
+```{r}
+hc.out=hclust(dist(nci_pca_x[,1:7]), method = "average")
+plot(hc.out,labels=datos2[,2], main="Hier. Clust. on First Seven Score Vectors")
+abline(h=18, col="red")
+```
+
+
+
+k-means, para las seis primeras componentes principales con $K=2$
+```{r}
+km.out = kmeans(nci_pca_x[,1:6], 2, nstart =20)
+plot( nci_pca_x[,1:6], col =( km.out$cluster +1) , main =" K-Means Clustering Results with K =2" , pch =20 , cex =2)
+km.out$tot.withinss #cluster sum of square (wss)
+```
+
+
+```{r}
+km.clusters=km.out$cluster
+table(datos2[,2], km.clusters)
+
+# Tabla de cotingencia
+```
+
+
+```{r}
+vec <- c(rep(0,50))
+for(i in 1:50){
+  km.out = kmeans(nci_pca_x[,1:6], i, nstart =20)
+  vec[i] = km.out$tot.withinss
+}
+plot(vec)
+```
+se puede agrupar en mas de 2 grupos, pero el k adecuado es 2. elbow
+
+Comparacion
+```{r}
+table(km.clusters,hc.clusters)
+```
+

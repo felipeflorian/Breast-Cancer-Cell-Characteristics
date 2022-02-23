@@ -1,0 +1,95 @@
+---
+title: "Características de las células del cáncer de mama"
+author:
+- name: Felipe Florián
+- affiliation: Universidad del Rosario
+  name: Luisa Salcedo
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r}
+datos = read.csv('data.csv',sep = ",")
+datos = datos[1:32]
+inf = summary(datos); inf
+```
+
+```{r}
+library(plotly)
+```
+
+
+```{r}
+x = datos$diagnosis
+y = datos$radius_mean
+plot(x, y, main="Media del radio", 
+   xlab="Diagnostigo", ylab="Radio", pch=1)
+```
+
+```{r}
+x = datos$diagnosis
+y = datos$texture_mean
+plot(x, y, main="Media de textura", 
+   xlab="Diagnostigo", ylab="Textura", pch=1)
+```
+
+```{r}
+x = datos$diagnosis
+y = datos$perimeter_mean
+plot(x, y, main="Media del Perimetro", 
+   xlab="Diagnostigo", ylab="Perimetro", pch=1)
+```
+
+
+```{r}
+x = datos$diagnosis
+y = datos$area_mean
+plot(x, y, main="Media del area", 
+   xlab="Diagnostigo", ylab="Area", pch=1)
+```
+
+```{r}
+x = datos$diagnosis
+y = datos$smoothness_mean
+plot(x, y, main="Media de suavidad", 
+   xlab="Diagnostigo", ylab="Suavidad", pch=1)
+```
+
+```{r}
+x = datos$diagnosis
+y = datos$compactness_mean
+plot(x, y, main="Media de compacidad", 
+   xlab="Diagnostigo", ylab="Compacidad", pch=1)
+```
+
+```{r}
+x = datos$diagnosis
+y = datos$concavity_mean
+plot(x, y, main="Media de concavidad", 
+   xlab="Diagnostigo", ylab="Concavidad", pch=1)
+```
+
+
+```{r}
+x = datos$diagnosis
+y = datos$concave.points_mean
+plot(x, y, main="Media del punto concavo", 
+   xlab="Diagnostigo", ylab="Concavo", pch=1)
+```
+
+```{r}
+x = datos$diagnosis
+y = datos$symmetry_mean
+plot(x, y, main="Media de simetria", 
+   xlab="Diagnostigo", ylab="Simetria", pch=1)
+```
+
+
+```{r}
+x = datos$diagnosis
+y = datos$fractal_dimension_mean
+plot(x, y, main="Media de la dimension del fractal", 
+   xlab="Diagnostigo", ylab="Fractal", pch=1)
+```

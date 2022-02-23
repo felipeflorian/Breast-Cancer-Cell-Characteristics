@@ -1,0 +1,85 @@
+---
+title: "LDA, QDA"
+author: "Andrés Felipe Florián Quitián, Luisa Salcedo, Camilo Martínez"
+date: "22/11/2020"
+output: html_document
+---
+
+Se carga el dataset.
+```{r}
+datos = read.csv('data.csv',sep = ",")
+head(datos)
+```
+
+
+```{r}
+library(MASS)
+```
+Se realiza un entrenamiento del 70% y una validacion del 30%, para una muestra de tamaño 100, y se calcula la media de los errores.
+
+```{r}
+errores_lda <- c(rep(0,100))
+errores_qda <- c(rep(0,100))
+for(i in 1:100){
+  indexes <- sample(1:nrow(datos), head(0.7*nrow(datos)))
+  training <- datos[indexes,]
+  validation <- datos[-indexes,]
+  lda <- lda(training[3:32], training$diagnosis)
+  lda.pred<- predict(lda, validation[3:32])
+  conf_lda <- table(validation$diagnosis, lda.pred$class); 
+  errores_lda[i] <- 1 - sum(diag(conf_lda))/nrow(validation)
+  qda <- qda(training[3:32], training$diagnosis)
+  qda.pred<- predict(qda, validation[3:32])
+  conf_qda <- table(validation$diagnosis, qda.pred$class)
+  errores_qda[i] <- 1 - sum(diag(conf_qda))/nrow(validation)
+}
+mean(errores_lda)
+mean(errores_qda)
+```
+
+Resumen estadistico de los errores del qda y lda.
+
+
+```{r}
+summary(errores_lda)
+t.test(errores_lda)
+```
+
+```{r}
+summary(errores_qda)
+t.test(errores_qda)
+```
+```{r}
+t.test(errores_lda,errores_qda)
+```
+
+
+```{r}
+boxplot(errores_lda,errores_qda,names=c("Errores LDA","Errores QDA"))#Muestra las diagramas
+medias <- c(mean(error_lda),mean(error_qda))#Muestra la Media mediante un punto
+points(medias,pch=18,col="red")
+```
+
+Matrices de confusión para un entrenamiento del 70% y una validacion del 30%.
+
+```{r}
+indexes <- sample(1:nrow(datos), head(0.7*nrow(datos)))
+training <- datos[indexes,]
+validation <- datos[-indexes,]
+```
+LDA
+```{r}
+lda <- lda(training[3:32], training$diagnosis)
+lda
+lda.pred<- predict(lda, validation[3:32])
+conf_lda <- table(validation$diagnosis, lda.pred$class); conf_lda
+(error_lda <- 1 - sum(diag(conf_lda))/nrow(validation))
+```
+QDA
+```{r}
+qda <- qda(training[3:32], training$diagnosis)
+qda
+qda.pred<- predict(qda, validation[3:32])
+conf_qda <- table(validation$diagnosis, qda.pred$class); conf_qda
+(error_qda <- 1 - sum(diag(conf_qda))/nrow(validation))
+```

@@ -1,0 +1,66 @@
+---
+title: "FA"
+author: "Andrés Felipe Florián Quitián,Luisa Salcedo, Camilo Martínez"
+date: "23/11/2020"
+output: html_document
+---
+
+Se carga el dataset.
+```{r}
+datos = read.csv('data.csv',sep = ",")
+datos = datos[3:32]
+head(datos)
+```
+
+Usando factanal con dos factores no rotados.
+
+```{r}
+fa_1 <- factanal(datos,factors = 2,rotation = "none",lower = 0.1)
+fa_1
+```
+
+Unicidades ($\hat\Psi$) del análisis de factores.
+(La Unicidad es la proporción de variabilidad, una unicidad alta para una variable, indica que la variable es muy variable)
+```{r}
+fa_1$uniquenesses
+```
+Comunalidad (son los loadings $\hat\Lambda$ al cuadrado)
+(La comunalidad es la proporción de variabilidad)
+```{r}
+apply(fa_1$loadings^2,1,sum) # communality
+```
+Matriz residual ($\hat\Sigma = \hat\Lambda\hat\Lambda^T + \hat\Psi$)
+```{r}
+Lambda = fa_1$loadings
+Psi = diag(fa_1$uniquenesses)
+S = fa_1$correlation
+Sigma = Lambda %*% t(Lambda) + Psi
+#Ahora restamos la matriz de correlación ajustada (Sigma) de nuestra matriz de correlación observada (S). También redondeamos el resultado a 6 dígitos.
+
+round(S - Sigma, 6)
+#En la matriz resultante los números cercanos a 0 indican que su modelo factorial es una buena representación del concepto subyacente.
+
+```
+
+
+
+Gráficas factores no rotados.
+```{r}
+load <- fa_1$loadings[,1:2]
+plot(load,type="n") 
+text(load,labels=names(datos),cex=.7)
+```
+Con una rotacion varimax
+```{r}
+fa_1 <- factanal(datos,2,rotation = "varimax",lower = 0.1)
+fa_1
+```
+Gráfica factores rotados.
+```{r}
+load <- fa_1$loadings[,1:2]
+plot(load,type="n") 
+text(load,labels=names(datos),cex=.7)
+```
+
+
+
